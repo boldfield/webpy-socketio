@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "webpy-socketio",
-    version = __import__("webpy_socketio").__version__,
+    version = "0.0.1",
     author = "Di SONG",
     author_email = "songdi19@gmail.com",
     description = ("A web.py app providing the features required to use "
