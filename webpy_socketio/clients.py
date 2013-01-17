@@ -1,4 +1,3 @@
-
 from webpy_socketio import events
 
 
@@ -7,16 +6,15 @@ from webpy_socketio import events
 # or reloaded.
 CLIENTS = {}
 
+
 def client_start(request, socket, context):
+    """Adds the client triple to CLIENTS.
     """
-    Adds the client triple to CLIENTS.
-    """
-    CLIENTS[socket.session.session_id] = (request, socket, context)
+    CLIENTS[socket.sessid] = (request, socket, context)
 
 
 def client_end(request, socket, context):
-    """
-    Handles cleanup when a session ends for the given client triple.
+    """Handles cleanup when a session ends for the given client triple.
     Sends unsubscribe and finish events, actually unsubscribes from
     any channels subscribed to, and removes the client triple from
     CLIENTS.
@@ -30,15 +28,13 @@ def client_end(request, socket, context):
     for channel in socket.channels[:]:
         socket.unsubscribe(channel)
     # Remove the client.
-    if socket.session.session_id in CLIENTS:
-		del CLIENTS[socket.session.session_id]
-   
+    if socket.sessid in CLIENTS:
+        del CLIENTS[socket.sessid]
+
+
 def client_end_all():
-    """
-    Performs cleanup on all clients - called by runserver_socketio
+    """Performs cleanup on all clients - called by runserver_socketio
     when the server is shut down or reloaded.
     """
     for request, socket, context in CLIENTS.values()[:]:
         client_end(request, socket, context)
-
-
