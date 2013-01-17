@@ -1,12 +1,8 @@
 
 from setuptools import setup, find_packages
 
-links = (
-    'https://github.com/boldfield/gevent-socketio.git#egg=gevent-socketio',
-)
-
 required = (
-    "gevent-socketio",
+    #"gevent-socketio",
     "web.py>=0.36"
 )
 
@@ -21,7 +17,6 @@ setup(
     url="https://github.com/boldfield/webpy-socketio",
     py_modules=["webpy_socketio", ],
     install_requires=required,
-    dependency_links=links,
     zip_safe=False,
     include_package_data=True,
     packages=find_packages(),
