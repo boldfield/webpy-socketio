@@ -1,10 +1,14 @@
 import re
+import sys
 
 
 class EventError(Exception):
     pass
 
 
+## This method of 'signaling' events is starting to feel wrong
+## and may need to get refactored. Moving to a strict socketio.namespace
+## approach may be appropriate.
 class Event(object):
     """Signal-like object for Socket.IO events that supports
     filtering on channels. Registering event handlers is
@@ -66,15 +70,16 @@ class Event(object):
             else:
                 matches = [pattern.match(c) for c in [channel] if pattern]
             if no_channel or filter(None, matches):
-                handler(channel, request, socket, context, *args)
+                args += (channel, ) if channel and channel not in args else ()
+                handler(request, socket, context, *args)
 
 
-on_connect = Event(False)  # channel, request, socket, context
-on_message = Event()       # channel, request, socket, context, endpoint, message
-on_event = Event()         # channel, request, socket, context, endpoint, message
-on_error = Event()         # channel, request, socket, context, exception
-on_disconnect = Event()    # channel, request, socket, context
-on_finish = Event()        # channel, request, socket, context
+on_connect = Event(False)  # request, socket, context
+on_message = Event()       # request, socket, context, endpoint, message
+on_event = Event()         # request, socket, context, endpoint, message, channel
+on_error = Event()         # request, socket, context, exception
+on_disconnect = Event()    # request, socket, context
+on_finish = Event()        # request, socket, context
 
 # Give each event a name attribute.
 for k, v in locals().items():

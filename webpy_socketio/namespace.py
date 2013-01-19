@@ -1,3 +1,5 @@
+import sys
+
 from socketio.namespace import BaseNamespace
 
 from webpy_socketio.utils import format_log
@@ -6,7 +8,9 @@ from webpy_socketio import events
 
 namespaces = {}
 
+
 def add_namespace(endpoint, namespace):
+    global namespaces
     namespaces[endpoint] = namespace
 
 
@@ -41,15 +45,16 @@ class GlobalNamespace(BaseNamespace):
             {'data': u'hi', 'endpoint': u'', 'type': 'message'}
         """
         try:
-            channel = packet['name']
             endpoint = packet['endpoint']
+            channel = None
             type = packet['type']
             if type == 'event':
+                channel = packet['name']
                 message = packet['args']
                 events.on_event.send(self.request, self.socket, self.environ, channel, endpoint, message)
             elif type == 'message':
                 message = packet['data']
-                events.on_message.send(self.request, self.socket, self.environ, channel, endpoint, message)
+                events.on_message.send(self.request, self.socket, self.environ, None, endpoint, message)
             else:
                 # TODO :: Determine if there are other types we might see here.
                 # TODO :: Client side connect/disconnect handled by
@@ -62,5 +67,4 @@ class GlobalNamespace(BaseNamespace):
         except Exception, exception:
             from traceback import print_exc
             print_exc()
-            events.on_error.send(self.request, self.socket, self.environ, None, exception)
-        return dict(hello='world')
+            events.on_error.send(self.request, self.socket, self.environ, channel, exception)
